@@ -2,7 +2,8 @@ import React from 'react';
 import { useState} from 'react';
 import { View, Text, Pressable, StyleSheet, TextInput} from 'react-native';
 import { auth, db } from '../../firebase/config';
-//falta agregar el remember me 
+// falta agregar el remember me 
+
 function Register(props) {
   const [email, setEmail] = useState("")
   const [username, setUserName] = useState("")
@@ -10,41 +11,43 @@ function Register(props) {
   const [registro, setregistro] = useState(false)
   const [registroError, setregistroError] = useState ("")
 
-function onSubmit(email,username,password){
-  if (!email.includes("@")){
-      setregistroError("Email mal formateado")
-      return
-    }
-  if (password.length < 6){
-      setregistroError("La contraseña debe tener al menos 6 caracteres")
-      return
-    }
-    auth.createUserWithEmailAndPassword(email,password)
+function onSubmit(email, username, password) {
+  if (!email.includes("@")) {
+    setregistroError("Email mal formateado")
+    return
+  }
+  if (password.length < 6) {
+    setregistroError("La contraseña debe tener al menos 6 caracteres")
+    return
+  }
+
+  auth.createUserWithEmailAndPassword(email, password)
     .then(response => {
-       db.collection("users").add({
-      email: auth.currentUser.email,
-      username: username,
-      createdAt: Date.now()
-    })
+      db.collection("users").add({
+        email: auth.currentUser.email,
+        username: username,
+        createdAt: Date.now()
+      })
       .then(() => {
-      setregistro(true)
-    })
+        setregistro(true)
+        props.navigation.navigate('Login')
+      })
       .catch(e => console.log(e))
     })
     .catch(error => {
-      setregistroError ("Fallo en el registro")
-      console.log(error);
-      if (error.message == 'The email address is already in use by another account.'){
+      console.log(error)
+      if (error.code === 'auth/email-already-in-use') {
         setregistroError("El usuario ya existe")
+      } else {
+        setregistroError("Fallo en el registro: " + error.message)
       }
     })
-  }
-
+}
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Registro</Text>
       <TextInput style={styles.field}
-            keyboardType='email-adress'
+            keyboardType='email-address'
             placeholder='email'
             onChangeText = {text => setEmail(text)}
             value={email}/>

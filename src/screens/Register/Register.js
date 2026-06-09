@@ -1,8 +1,7 @@
 import React from 'react';
-import { useState} from 'react';
+import { useState, useEffect} from 'react';
 import { View, Text, Pressable, StyleSheet, TextInput} from 'react-native';
 import { auth, db } from '../../firebase/config';
-// falta agregar el remember me 
 
 function Register(props) {
   const [email, setEmail] = useState("")
@@ -10,6 +9,17 @@ function Register(props) {
   const [password, setPassword] = useState("")
   const [registro, setregistro] = useState(false)
   const [registroError, setregistroError] = useState ("")
+
+useEffect(
+    () => {
+        auth.onAuthStateChanged(
+          user => {
+                if (user) {
+                    props.navigation.navigate('Login')
+      }
+    })
+  }, []
+)
 
 function onSubmit(email, username, password) {
   if (!email.includes("@")) {

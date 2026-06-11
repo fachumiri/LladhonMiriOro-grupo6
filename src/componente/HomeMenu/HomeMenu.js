@@ -1,7 +1,11 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesome } from '@expo/vector-icons';
-// hay que importar los componentes home, perfil, crearposteo, comentarposteo
+import { Ionicons } from '@expo/vector-icons';
+import Home from '../../screens/Home/Home';
+import Perfil from '../../screens/Perfil/Perfil';
+
+
 const Tab = createBottomTabNavigator();
 
 function HomeMenu() {
@@ -12,7 +16,7 @@ function HomeMenu() {
         component={Home}
         options={{
           tabBarIcon: () => (
-            <FontAwesome name="home" size={size} color={color} />
+            <FontAwesome name="home" size={24} color="black" />
           ),
         }}
       />
@@ -25,24 +29,8 @@ function HomeMenu() {
           ),
         }}
       />
-      <Tab.Screen 
-      name="Crear posteo" 
-      component={CrearPosteo} 
-      options={{
-        tabBarIcon: () => (
-            <Ionicons name="create" size={24} color="black" />
-        ),
-        }}
-        />
-        <Tab.Screen 
-        name="Comentar posteo" 
-        component={StackComentario} 
-        options={{
-            tabBarIcon: () => (
-            <FontAwesome name="comment-alt" size={24} color="black" />
-            ),
-        }}/>
     </Tab.Navigator>
   );
 }
-export default HomeMenu
+
+export default HomeMenu;

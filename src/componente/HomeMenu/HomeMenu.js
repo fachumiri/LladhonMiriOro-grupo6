@@ -5,7 +5,6 @@ import { Ionicons } from '@expo/vector-icons';
 import Home from '../../screens/Home/Home';
 import Perfil from '../../screens/Perfil/Perfil';
 
-
 const Tab = createBottomTabNavigator();
 
 function HomeMenu() {

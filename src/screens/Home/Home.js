@@ -52,7 +52,7 @@ function Home({ navigation }) {
 
     return (
       <View style={estilos.tarjetaPosteo}>
-        <Text style={estilos.usuarioPosteo}>{item.username || item.email}</Text>
+        <Text style={estilos.usuarioPosteo}>{item.owner || item.email}</Text>
 
         {item.image ? (
           <Image source={{ uri: item.image }} style={estilos.imagenPosteo} />

@@ -17,7 +17,7 @@ function Perfil({ navigation }) {
   useEffect(() => {
     const cancelarSuscripcion = db
       .collection("posts")
-      .where("email", "==", usuarioActual.email)
+      .where("owner", "==", usuarioActual.email)
       .onSnapshot((snapshot) => {
         const listaPosteos = [];
         snapshot.forEach((documento) => {

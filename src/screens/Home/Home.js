@@ -14,7 +14,7 @@ function Home({ navigation }) {
   const [posteos, setPosteos] = useState([]);
   const [cargando, setCargando] = useState(true);
 
-  const usuarioActual = auth.cwurrentUser;
+  const usuarioActual = auth.currentUser;
 
   useEffect(() => {
     const cancelarSuscripcion = db

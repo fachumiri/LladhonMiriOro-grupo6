@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, Image, Pressable, StyleSheet, ActivityIndicator } from "react-native";
-import { db } from "../../firebase/config";
-import { auth } from "../../firebase/config";
+import { db, auth } from "../../firebase/config";
 import firebase from "firebase";
 
 function Home(props) {
@@ -29,7 +28,7 @@ function Home(props) {
   const manejarLike = (posteo) => {
     const yaLikeado =
       posteo.data.likes &&
-      posteo.data.likes.includes(auth.currentUser.email);
+      posteo.data.likes.filter(like => like === auth.currentUser.email).length > 0;
 
     if (yaLikeado) {
       db.collection("posts")
@@ -52,12 +51,9 @@ function Home(props) {
 
   const renderPosteo = ({ item }) => {
     const yaLikeado =
-      item.data.likes &&
-      item.data.likes.includes(auth.currentUser.email);
+      item.data.likes && item.data.likes.filter(like => like === auth.currentUser.email).length > 0;
 
-    const cantidadLikes = item.data.likes
-      ? item.data.likes.length
-      : 0;
+    const cantidadLikes = item.data.likes ? item.data.likes.length: 0;
 
     return (
       <View style={estilos.tarjetaPosteo}>
@@ -109,10 +105,7 @@ function Home(props) {
   if (cargando) {
     return (
       <View style={estilos.centrado}>
-        <ActivityIndicator
-          size="large"
-          color="#444"
-        />
+        <ActivityIndicator size="large" color="#444" />
       </View>
     );
   }

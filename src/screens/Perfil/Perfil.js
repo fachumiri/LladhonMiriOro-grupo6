@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet, ActivityIndicator } from "react-native";
-import { db } from "../../firebase/config";
-import { auth } from "../../firebase/config";
+import { db, auth } from "../../firebase/config";
 
 function Perfil(props) {
   const [misPosteos, setMisPosteos] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     db.collection("posts")
@@ -22,6 +22,14 @@ function Perfil(props) {
 
         setMisPosteos(posteos);
         setCargando(false);
+      });
+
+    db.collection("users")
+      .where("email", "==", auth.currentUser.email)
+      .onSnapshot((docs) => {
+        docs.forEach((doc) => {
+          setUserName(doc.data().userName);
+        });
       });
   }, []);
 
@@ -58,7 +66,7 @@ function Perfil(props) {
     <View style={estilos.contenedor}>
       <View style={estilos.encabezadoPerfil}>
         <Text style={estilos.nombreUsuario}>
-          {auth.currentUser.displayName ? auth.currentUser.displayName : "Usuario"}
+          {userName ? userName : "Usuario"}
         </Text>
 
         <Text style={estilos.email}>

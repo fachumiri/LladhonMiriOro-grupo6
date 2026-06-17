@@ -1,78 +1,105 @@
 import React, { useState, useEffect } from "react";
-import { View } from "react-native";
-import { Text } from "react-native";
-import { FlatList } from "react-native";
-import { Image } from "react-native";
-import { Pressable } from "react-native";
-import { StyleSheet } from "react-native";
-import { ActivityIndicator } from "react-native";
+import { View, Text, FlatList, Image, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { db } from "../../firebase/config";
 import { auth } from "../../firebase/config";
 import firebase from "firebase";
 
-function Home({ navigation }) {
+function Home(props) {
   const [posteos, setPosteos] = useState([]);
   const [cargando, setCargando] = useState(true);
 
-  const usuarioActual = auth.currentUser;
-
   useEffect(() => {
-    const cancelarSuscripcion = db
-      .collection("posts")
+    db.collection("posts")
       .orderBy("createdAt", "desc")
-      .onSnapshot((snapshot) => {
-        const listaPosteos = [];
-        snapshot.forEach((documento) => {
-          listaPosteos.push({ id: documento.id, ...documento.data() });
+      .onSnapshot((docs) => {
+        let listaPosteos = [];
+
+        docs.forEach((doc) => {
+          listaPosteos.push({
+            id: doc.id,
+            data: doc.data(),
+          });
         });
+
         setPosteos(listaPosteos);
         setCargando(false);
       });
-
-    return () => cancelarSuscripcion();
   }, []);
 
   const manejarLike = (posteo) => {
-    const yaLikeado = posteo.likes && posteo.likes.includes(usuarioActual.email);
+    const yaLikeado =
+      posteo.data.likes &&
+      posteo.data.likes.includes(auth.currentUser.email);
 
     if (yaLikeado) {
-      db.collection("posts").doc(posteo.id).update({
-        likes: firebase.firestore.FieldValue.arrayRemove(usuarioActual.email),
-      });
+      db.collection("posts")
+        .doc(posteo.id)
+        .update({
+          likes: firebase.firestore.FieldValue.arrayRemove(
+            auth.currentUser.email
+          ),
+        });
     } else {
-      db.collection("posts").doc(posteo.id).update({
-        likes: firebase.firestore.FieldValue.arrayUnion(usuarioActual.email),
-      });
+      db.collection("posts")
+        .doc(posteo.id)
+        .update({
+          likes: firebase.firestore.FieldValue.arrayUnion(
+            auth.currentUser.email
+          ),
+        });
     }
   };
 
   const renderPosteo = ({ item }) => {
-    const yaLikeado = item.likes && item.likes.includes(usuarioActual.email);
-    const cantidadLikes = item.likes ? item.likes.length : 0;
+    const yaLikeado =
+      item.data.likes &&
+      item.data.likes.includes(auth.currentUser.email);
+
+    const cantidadLikes = item.data.likes
+      ? item.data.likes.length
+      : 0;
 
     return (
       <View style={estilos.tarjetaPosteo}>
-        <Text style={estilos.usuarioPosteo}>{item.owner || item.email}</Text>
+        <Text style={estilos.usuarioPosteo}>
+          {item.data.owner}
+        </Text>
 
-        {item.image ? (
-          <Image source={{ uri: item.image }} style={estilos.imagenPosteo} />
+        {item.data.image ? (
+          <Image
+            source={{ uri: item.data.image }}
+            style={estilos.imagenPosteo}
+          />
         ) : null}
 
-        <Text style={estilos.descripcionPosteo}>{item.description}</Text>
+        <Text style={estilos.descripcionPosteo}>
+          {item.data.description}
+        </Text>
 
         <View style={estilos.filaAcciones}>
           <Pressable onPress={() => manejarLike(item)}>
-            <Text style={yaLikeado ? estilos.textoLikeado : estilos.textoLike}>
+            <Text
+              style={
+                yaLikeado
+                  ? estilos.textoLikeado
+                  : estilos.textoLike
+              }
+            >
               Me gusta ({cantidadLikes})
             </Text>
           </Pressable>
 
           <Pressable
             onPress={() =>
-              navigation.navigate("Comentar posteo", { postId: item.id })
+              props.navigation.navigate(
+                "Comentar posteo",
+                { postId: item.id }
+              )
             }
           >
-            <Text style={estilos.textocomentar}>Comentar</Text>
+            <Text style={estilos.textocomentar}>
+              Comentar
+            </Text>
           </Pressable>
         </View>
       </View>
@@ -82,7 +109,10 @@ function Home({ navigation }) {
   if (cargando) {
     return (
       <View style={estilos.centrado}>
-        <ActivityIndicator size="large" color="#444" />
+        <ActivityIndicator
+          size="large"
+          color="#444"
+        />
       </View>
     );
   }
@@ -93,9 +123,6 @@ function Home({ navigation }) {
         data={posteos}
         keyExtractor={(item) => item.id}
         renderItem={renderPosteo}
-        ListEmptyComponent={
-          <Text style={estilos.textoVacio}>No hay posteos todavía.</Text>
-        }
       />
     </View>
   );
@@ -117,10 +144,6 @@ const estilos = StyleSheet.create({
     marginHorizontal: 12,
     borderRadius: 10,
     padding: 14,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
   },
   usuarioPosteo: {
     fontWeight: "bold",
@@ -155,12 +178,6 @@ const estilos = StyleSheet.create({
   textocomentar: {
     color: "#555",
     fontSize: 14,
-  },
-  textoVacio: {
-    textAlign: "center",
-    marginTop: 40,
-    color: "#999",
-    fontSize: 15,
   },
 });
 

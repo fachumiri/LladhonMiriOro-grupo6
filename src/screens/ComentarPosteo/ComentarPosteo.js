@@ -65,9 +65,6 @@ function ComentarPosteo(props) {
         data={comentarios}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderComentario}
-        ListEmptyComponent={
-          <Text style={estilos.textoVacio}>Todavía no hay comentarios.</Text>
-        }
       />
 
       <View style={estilos.filaInput}>

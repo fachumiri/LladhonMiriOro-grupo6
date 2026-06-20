@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, TextInput, View, Text, StyleSheet } from "react-native";
 import { auth, db } from "../../firebase/config";
 
-export default function CrearPosteo({ navigation }) {
+function CrearPosteo(props) {
   const [description, setDescription] = useState("");
 
   function onSubmit() {
@@ -12,10 +12,11 @@ export default function CrearPosteo({ navigation }) {
         owner: auth.currentUser.email,
         createdAt: Date.now(),
         likes: [],
+        comments: [],
       })
       .then(() => {
         setDescription("");
-        navigation.navigate("Home");
+        props.navigation.navigate("Home");
       })
       .catch((e) => console.log(e));
   }
@@ -29,8 +30,6 @@ export default function CrearPosteo({ navigation }) {
         placeholder="Escribí tu posteo..."
         value={description}
         onChangeText={setDescription}
-        multiline
-        numberOfLines={4}
       />
 
       <Pressable style={estilos.boton} onPress={onSubmit}>
@@ -78,3 +77,5 @@ const estilos = StyleSheet.create({
     fontSize: 15,
   },
 });
+
+export default CrearPosteo; 

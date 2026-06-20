@@ -2,7 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { View, Text, Pressable, StyleSheet,TextInput} from 'react-native';
 import { auth } from '../../firebase/config';
-//copiar el login en PI OG --> fijarse si funciona 
+
 function Login(props) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")

@@ -2,44 +2,38 @@ import React, { useState, useEffect } from "react";
 import { View, Text, FlatList, TextInput, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { db } from "../../firebase/config";
 import { auth } from "../../firebase/config";
+import firebase from "firebase";
 
-function ComentarPosteo({ route }) {
+function ComentarPosteo(props) {
+  const postId = props.route.params.postId;
+
   const [comentarios, setComentarios] = useState([]);
   const [comentario, setComentario] = useState("");
   const [cargando, setCargando] = useState(true);
 
-  const { postId } = route.params;
   const usuarioActual = auth.currentUser;
 
   useEffect(() => {
-    const cancelarSuscripcion = db
-      .collection("posts")
+    db.collection("posts")
       .doc(postId)
-      .collection("comentarios")
-      .orderBy("createdAt", "desc")
-      .onSnapshot((snapshot) => {
-        const listaComentarios = [];
-        snapshot.forEach((documento) => {
-          listaComentarios.push({ id: documento.id, ...documento.data() });
-        });
+      .onSnapshot((doc) => {
+        const data = doc.data();
+        const listaComentarios = data.comments ? data.comments: [];
         setComentarios(listaComentarios);
         setCargando(false);
       });
-
-    return () => cancelarSuscripcion();
   }, []);
 
   function onSubmit() {
-    if (!comentario.trim()) return;
-
     db.collection("posts")
       .doc(postId)
-      .collection("comentarios")
-      .add({
+      .update({
+        comments: firebase.firestore.FieldValue.arrayUnion({
         owner: usuarioActual.email,
         comment: comentario,
         createdAt: Date.now(),
-      })
+      }),
+    })
       .then(() => {
         setComentario("");
       })
@@ -69,7 +63,7 @@ function ComentarPosteo({ route }) {
 
       <FlatList
         data={comentarios}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={renderComentario}
         ListEmptyComponent={
           <Text style={estilos.textoVacio}>Todavía no hay comentarios.</Text>
